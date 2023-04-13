@@ -1,11 +1,128 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
 
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+// Data model 
+//      The database tables with Prisma's model representation
+
+model Books {
+    id Int @id @default(autoincrement())
+
+    title        String
+    subtitle     String?
+    pub_location String
+    pub_date     String
+
+    url         String?
+    pub_company String
+    edition     String
+    is_ebook    Boolean
+    isbn_10     String
+    isbnn_13    String
+    section     String?
+
+    book_reference BookReference[]
+
+    @@map("books")
+}
+
+model Thesis {
+    id Int @id @default(autoincrement())
+
+    title        String
+    subtitle     String?
+    pub_location String
+    pub_date     String
+
+    institute    String
+    volume       Int?
+    pages        Int
+    category     String
+    defence_year DateTime
+
+    thesis_reference ThesisReference[]
+
+    @@map("thesis")
+}
+
+model Magazine {
+    id Int @id @default(autoincrement())
+
+    title        String
+    subtitle     String?
+    pub_location String
+    pub_date     String
+
+    magazine_name String
+    volume        Int
+    initial_page  Int
+    final_page    Int
+    isbn_10       String
+    isbnn_13      String
+
+    magazine_reference MagazineReference[]
+
+    @@map("magazines")
+}
+
+model BookReference {
+    id              Int      @id @default(autoincrement())
+    reference_title String
+    reference_type  String
+    created_at      DateTime
+
+    book     Books @relation(fields: [books_id], references: [id])
+    books_id Int
+
+    authors Authors[]
+
+    @@map("books_references")
+}
+
+model ThesisReference {
+    id              Int      @id @default(autoincrement())
+    reference_title String
+    reference_type  String
+    created_at      DateTime
+
+    thesis    Thesis @relation(fields: [thesis_id], references: [id])
+    thesis_id Int
+
+    authors Authors[]
+
+    @@map("thesis_references")
+}
+
+model MagazineReference {
+    id              Int      @id @default(autoincrement())
+    reference_title String
+    reference_type  String
+    created_at      DateTime
+
+    magazine    Magazine @relation(fields: [magazine_id], references: [id])
+    magazine_id Int
+
+    authors Authors[]
+
+    @@map("magazines_references")
+}
+
+model Authors {
+    id                   Int                 @id @default(autoincrement())
+    first_name           String
+    last_name            String
+    birthdate            DateTime?
+
+    books_references     BookReference[]
+    thesis_references    ThesisReference[]
+    magazines_references MagazineReference[]
+
+    @@map("authors")
 }
